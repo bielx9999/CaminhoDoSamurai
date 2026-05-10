@@ -8,15 +8,17 @@ from Chefao import *
 from ShootShuriken import *
 from Tela_menu import tela_inicial
 from Tela_game_over import tela_game_over
+from Tela_vitoria import tela_vitoria
 
 pygame.init()
 
-display = pygame.display.set_mode([900, 480])
-pygame.display.set_caption("Caminho do Samurai")
+display = pygame.display.set_mode([900, 480]) #Tela do jogo
+pygame.display.set_caption("Caminho do Samurai") #Nome da Janela
 
 musica_game   = "Sons/MusicaGame.mp3"
 musica_chefao = "Sons/Musica_Chefao.mp3"
 
+SCORE_VITORIA = 250 # pontuacao da vitoria
 
 def carregar_hud():
     vidas_imgs = {
@@ -43,15 +45,14 @@ def iniciar_jogo():
     bg.image = pygame.transform.scale(
         pygame.image.load('ambientes/background - 1.png'), [900, 480]
     )
-    bg.rect = bg.image.get_rect()
 
+    bg.rect = bg.image.get_rect()
     guy = Samurai(ObjectGroup)
     Inimigo(ObjectGroup, InimigoGroup)
-
     pygame.mixer_music.load(musica_game)
     pygame.mixer_music.play(-1)
 
-    shoot_sound = pygame.mixer.Sound('Sons/EspadaLanca.ogg')
+    shoot_sound = pygame.mixer.Sound('Sons/EspadaLanca.ogg') # Som da shuriken
 
     estado = {
         'kills_goblin': 0,
@@ -59,6 +60,7 @@ def iniciar_jogo():
         'kills_chefao': 0,
         'score':        0,
         'gameOver':     False,
+        'venceu':       False,
         'chefao_ativo': False,
         'chefao_inst':  None,
         'musica_chefao_tocando': False,
@@ -80,12 +82,10 @@ def spawnar_chefao(guy, ObjectGroup, ChefaoGroup, InimigoGroup, estado):
     pygame.mixer_music.play(-1)
     estado['musica_chefao_tocando'] = True
 
-
 def voltar_musica_normal(estado):
     pygame.mixer_music.load(musica_game)
     pygame.mixer_music.play(-1)
     estado['musica_chefao_tocando'] = False
-
 
 def desenhar_hud_holder(surface, x, y, w, h):
     holder = pygame.Surface((w, h), pygame.SRCALPHA)
@@ -106,7 +106,7 @@ while rodando:
 
     ObjectGroup, InimigoGroup, ChefaoGroup, ShootGroup, guy, shoot_sound, estado = iniciar_jogo()
 
-    while not estado['gameOver']:
+    while not estado['gameOver'] and not estado['venceu']:
         clock.tick(60)
 
         for event in pygame.event.get():
@@ -157,6 +157,11 @@ while rodando:
                         estado['score']        += 30
                         voltar_musica_normal(estado)
 
+        ## verifica condição de vitória
+        if estado['score'] >= SCORE_VITORIA:
+            estado['venceu'] = True
+        # ──────────────────────────────────────────────────────────────────────
+
         if not estado['chefao_ativo']:
             estado['timer_goblin'] += 1
             if estado['timer_goblin'] > 20:
@@ -198,19 +203,29 @@ while rodando:
             bw = int((estado['chefao_inst'].vida / 10) * 410)
             pygame.draw.rect(display, (220, 0, 0), (245, 40, bw,  18), border_radius=5)
             tb = fonte_boss.render(f"CHEFÃO  {estado['chefao_inst'].vida}/10", True, (255, 255, 255))
-            display.blit(tb, (450 - tb.get_width() // 2, 4))
+            display.blit(tb, (450 - tb.get_width() // 2, 40))
 
         pygame.display.update()
 
-    # GAME OVER
+    # decide qual tela mostrar
     pygame.mixer_music.stop()
-    escolha = tela_game_over(
-        display,
-        estado['score'],
-        estado['kills_goblin'],
-        estado['kills_dragao'],
-        estado['kills_chefao'],
-    )
+
+    if estado['venceu']:
+        escolha = tela_vitoria(
+            display,
+            estado['score'],
+            estado['kills_goblin'],
+            estado['kills_dragao'],
+            estado['kills_chefao'],
+        )
+    else:
+        escolha = tela_game_over(
+            display,
+            estado['score'],
+            estado['kills_goblin'],
+            estado['kills_dragao'],
+            estado['kills_chefao'],
+        )
 
     if escolha == 'menu':
         tela_inicial(display)
