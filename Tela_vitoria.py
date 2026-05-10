@@ -7,7 +7,6 @@ def tela_vitoria(screen, score, kills_goblin, kills_dragao, kills_chefao):
     CINZA_BTN   = (90,  90,  90)
     CINZA_HOVER = (130, 130, 130)
     PRETO       = (0,   0,   0)
-    DOURADO     = (255, 215,  0)
 
     fonte_info    = pygame.font.SysFont(None, 30)
     fonte_botao   = pygame.font.SysFont(None, 32)
@@ -50,7 +49,7 @@ def tela_vitoria(screen, score, kills_goblin, kills_dragao, kills_chefao):
         else:
             screen.fill(PRETO)
 
-        # Título "VITÓRIA!"
+        # Título
         txt_vitoria = fonte_vitoria.render("VITÓRIA!", True, DOURADO)
         pos_x = W // 2 - txt_vitoria.get_width() // 2
         pos_y = 50
@@ -70,14 +69,12 @@ def tela_vitoria(screen, score, kills_goblin, kills_dragao, kills_chefao):
         )
         screen.blit(txt_kills, (W // 2 - txt_kills.get_width() // 2, H // 2 + 45))
 
-        # Botão MENU
         cor_menu = CINZA_HOVER if btn_menu.collidepoint(mouse) else CINZA_BTN
         pygame.draw.rect(screen, cor_menu, btn_menu, border_radius=8)
         txt_menu = fonte_botao.render("MENU", True, BRANCO)
         screen.blit(txt_menu, (btn_menu.centerx - txt_menu.get_width() // 2,
                                 btn_menu.centery - txt_menu.get_height() // 2))
 
-        # Botão RESTART
         cor_rest = CINZA_HOVER if btn_restart.collidepoint(mouse) else CINZA_BTN
         pygame.draw.rect(screen, cor_rest, btn_restart, border_radius=8)
         txt_rest = fonte_botao.render("RESTART", True, BRANCO)

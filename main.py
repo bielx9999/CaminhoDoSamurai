@@ -1,6 +1,6 @@
 import pygame
 import random
-import sys
+import sys,os
 from Samurai import *
 from Inimigo import *
 from Dragao import *
@@ -9,6 +9,12 @@ from ShootShuriken import *
 from Tela_menu import tela_inicial
 from Tela_game_over import tela_game_over
 from Tela_vitoria import tela_vitoria
+
+dirpath = os.getcwd()
+sys.path.append(dirpath)
+
+if getattr(sys, "frozen", False):
+    os.chdir(sys._MEIPASS)
 
 pygame.init()
 
